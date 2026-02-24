@@ -1,27 +1,22 @@
- <!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TUI Mock – In-App Virtual Assistant Call (WebRTC) + Live Transcription + xApp Overlay</title>
+  <title>TUI Mock – WebRTC Call + Merged Transcription + xApp Overlay</title>
 
   <style>
     :root{
-      /* TUI-ish palette (approx) */
       --tui-red:#D81E27;
       --tui-ink:#0B1B3A;
-      --tui-ink-2:#1E2A55;
       --tui-muted:#5A6782;
       --tui-bg:#F3F6FB;
       --tui-card:#FFFFFF;
       --tui-line:#E2E8F2;
       --tui-blue:#0C4B9E;
       --tui-blue-2:#0A3E86;
-      --tui-soft:#EEF4FF;
       --shadow:0 18px 48px rgba(11,27,58,.14);
       --shadow-soft:0 12px 28px rgba(11,27,58,.10);
-      --radius:22px;
-      --radius2:28px;
       --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
@@ -75,29 +70,20 @@
       font-size:12px;
       color:rgba(11,27,58,.70);
     }
+
+    /* ✅ Logo (as requested) */
     .brand{
       justify-self:center;
       display:flex;
       align-items:center;
-      gap:10px;
-      font-weight:1000;
-      letter-spacing:.2px;
+      justify-content:center;
     }
-    /* Simple placeholder “logo” */
-    .brandMark{
-      width:34px;height:34px;border-radius:999px;
-      background: radial-gradient(60% 60% at 30% 25%, rgba(255,255,255,.7), transparent 60%),
-                  linear-gradient(135deg, var(--tui-red), #ff6a6f);
-      display:grid;place-items:center;
-      color:#fff;
-      font-weight:1000;
-      font-size:14px;
-      box-shadow:0 10px 20px rgba(216,30,39,.22);
+    .tuiLogo{
+      height:28px;         /* tweak */
+      width:auto;
+      display:block;
     }
-    .brandText{
-      font-size:14px;
-      color:rgba(11,27,58,.92);
-    }
+
     .appbarIcons{
       justify-self:end;
       display:flex;
@@ -125,7 +111,6 @@
       scrollbar-width:none;
     }
     .cats::-webkit-scrollbar{ display:none; }
-
     .cat{
       min-width:78px;
       display:flex;
@@ -162,159 +147,11 @@
       padding:14px 14px 96px;
     }
 
-    .searchPill{
-      width:100%;
-      border-radius:999px;
-      background:#fff;
-      border:2px solid rgba(12,75,158,.65);
-      color:rgba(12,75,158,.95);
-      font-weight:1000;
-      font-size:18px;
-      padding:16px 14px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      box-shadow:0 14px 30px rgba(11,27,58,.10);
-      user-select:none;
-      margin:8px 0 14px;
-    }
-
-    .card{
-      background:var(--tui-card);
-      border:1px solid var(--tui-line);
-      border-radius:var(--radius2);
-      box-shadow:var(--shadow-soft);
-      overflow:hidden;
-    }
-
-    .promoCard{
-      border-radius:26px;
-      background: linear-gradient(135deg, #DDEBFF, #C7F1F7);
-      border:1px solid rgba(12,75,158,.10);
-      box-shadow:0 18px 44px rgba(11,27,58,.12);
-      overflow:hidden;
-    }
-    .promoTop{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      min-height:160px;
-    }
-    .promoLeft{
-      background:#17155E;
-      padding:18px;
-      color:#fff;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:10px;
-    }
-    .promoLeft .big{
-      font-weight:1100;
-      font-size:44px;
-      letter-spacing:-.6px;
-      line-height:1;
-    }
-    .promoLeft .small{
-      opacity:.9;
-      font-weight:900;
-      font-size:13px;
-      line-height:1.3;
-    }
-    .promoRight{
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:10px;
-      color:rgba(11,27,58,.92);
-    }
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.72);
-      border:1px solid rgba(11,27,58,.10);
-      font-weight:1000;
-      width:max-content;
-    }
-    .promoText{
-      font-size:14px;
-      font-weight:900;
-      color:rgba(11,27,58,.78);
-      line-height:1.3;
-    }
-    .promoBottom{
-      padding:16px 18px 18px;
-      background:rgba(255,255,255,.70);
-      backdrop-filter: blur(10px);
-      border-top:1px solid rgba(255,255,255,.7);
-    }
-    .promoBottom h3{
-      margin:0 0 6px;
-      font-size:22px;
-      font-weight:1100;
-      letter-spacing:-.2px;
-      color:rgba(11,27,58,.95);
-    }
-    .promoBottom p{
-      margin:0 0 14px;
-      font-size:13px;
-      font-weight:900;
-      color:rgba(11,27,58,.60);
-      line-height:1.35;
-    }
-
-    .btnRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-    .btn{
-      appearance:none;
-      border:none;
-      cursor:pointer;
-      border-radius:16px;
-      padding:12px 14px;
-      font-weight:1000;
-      font-size:13px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      user-select:none;
-    }
-    .btn.primary{
-      background: linear-gradient(180deg, var(--tui-blue), var(--tui-blue-2));
-      color:#fff;
-      box-shadow:0 14px 28px rgba(12,75,158,.22);
-    }
-    .btn.red{
-      background: linear-gradient(180deg, var(--tui-red), #ff5158);
-      color:#fff;
-      box-shadow:0 14px 28px rgba(216,30,39,.18);
-    }
-    .btn.ghost{
-      background:#fff;
-      border:1px solid var(--tui-line);
-      color:rgba(11,27,58,.82);
-      box-shadow:none;
-    }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
-
     .sectionRow{
       display:flex;
       justify-content:space-between;
       align-items:center;
-      margin:16px 2px 10px;
+      margin:14px 2px 10px;
       gap:10px;
     }
     .sectionTitle{
@@ -335,74 +172,15 @@
       border:1px solid rgba(12,75,158,.12);
     }
 
-    /* Booking summary card */
-    .bookingCard{
-      padding:14px;
-      border-radius:26px;
-    }
-    .bookingTop{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:12px;
-      margin-bottom:10px;
-    }
-    .bookingTitle{
-      font-size:16px;
-      font-weight:1100;
-      margin:0;
-      color:rgba(11,27,58,.95);
-      line-height:1.2;
-    }
-    .bookingMeta{
-      margin:6px 0 0;
-      font-size:12.5px;
-      font-weight:950;
-      color:rgba(11,27,58,.62);
-      line-height:1.35;
-    }
-    .bookingBadge{
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid rgba(22,163,74,.18);
-      background: rgba(22,163,74,.10);
-      color: rgba(22,101,52,.95);
-      font-weight:1100;
-      font-size:12px;
-      white-space:nowrap;
-    }
-
-    .infoGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    .infoTile{
+    .card{
+      background:var(--tui-card);
       border:1px solid var(--tui-line);
-      border-radius:18px;
-      padding:10px 10px;
-      background:#fff;
-      box-shadow:0 10px 22px rgba(11,27,58,.06);
-    }
-    .infoTile .k{
-      font-size:11.5px;
-      font-weight:1100;
-      color:rgba(11,27,58,.55);
-      margin-bottom:4px;
-    }
-    .infoTile .v{
-      font-size:12.5px;
-      font-weight:1100;
-      color:rgba(11,27,58,.92);
-      line-height:1.25;
+      border-radius:28px;
+      box-shadow:var(--shadow-soft);
+      overflow:hidden;
+      padding:14px;
     }
 
-    /* “Message” style assistant card */
-    .msgCard{
-      padding:14px;
-      border-radius:26px;
-    }
     .msgHeader{
       display:flex;
       justify-content:space-between;
@@ -457,21 +235,41 @@
       font-weight:900;
     }
 
-    .userReplyRow{
-      margin-top:12px;
+    .btnRow{
       display:flex;
-      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:12px;
     }
-    .userReply{
-      max-width:78%;
-      background: rgba(12,75,158,.10);
-      border:1px solid rgba(12,75,158,.16);
-      color: rgba(11,27,58,.86);
-      border-radius:20px;
-      padding:10px 12px;
+    .btn{
+      appearance:none;
+      border:none;
+      cursor:pointer;
+      border-radius:16px;
+      padding:12px 14px;
       font-weight:1000;
       font-size:13px;
-      box-shadow:0 10px 25px rgba(11,27,58,.06);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      user-select:none;
+    }
+    .btn.primary{
+      background: linear-gradient(180deg, var(--tui-blue), var(--tui-blue-2));
+      color:#fff;
+      box-shadow:0 14px 28px rgba(12,75,158,.22);
+    }
+    .btn.ghost{
+      background:#fff;
+      border:1px solid var(--tui-line);
+      color:rgba(11,27,58,.82);
+      box-shadow:none;
+    }
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
     }
 
     /* Bottom nav */
@@ -584,8 +382,8 @@
     #transcriptCard{
       display:flex;
       flex-direction:column;
-      height:320px;
-      min-height:260px;
+      height:340px;
+      min-height:280px;
       border:1px solid var(--tui-line);
       border-radius:22px;
       padding:12px;
@@ -654,12 +452,6 @@
       height:100%;
     }
 
-    .tuiLogo{
-      height:28px;         /* tweak */
-      width:auto;
-      display:block;
-}
-
     /* Hide Cognigy launcher visually once we use our own controls */
     .hide-cognigy-launcher button[data-testid="cognigy-call-button"]{
       opacity:0 !important;
@@ -676,13 +468,13 @@
         <div class="appbarTop">
           <div class="time">11:07</div>
 
-          <!-- Update this to an <img> if you have a TUI logo URL -->
+          <!-- ✅ TUI Logo -->
           <div class="brand" title="TUI">
             <img class="tuiLogo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Tui_logo.png" alt="TUI" />
           </div>
 
           <div class="appbarIcons">
-            <div class="iconBtn" id="btnBell" title="Notifications">🔔</div>
+            <div class="iconBtn" title="Notifications">🔔</div>
           </div>
         </div>
 
@@ -697,80 +489,12 @@
       </div>
 
       <div class="content">
-        <div class="searchPill" id="btnSearch">Search Holidays</div>
-
-        <div class="promoCard" style="margin-bottom:14px;">
-          <div class="promoTop">
-            <div class="promoLeft">
-              <div style="font-weight:1000; opacity:.9;">Up to</div>
-              <div class="big">£300</div>
-              <div class="small">off in the TUI Sale (mock)</div>
-            </div>
-            <div class="promoRight">
-              <div class="tag">EXTRA SAVINGS</div>
-              <div class="promoText">Plus, <b>£200</b> off selected holidays with your code</div>
-              <div class="promoText" style="opacity:.8;">(Demo content)</div>
-            </div>
-          </div>
-          <div class="promoBottom">
-            <h3>Use code EXTRA200 to unlock extra savings</h3>
-            <p>Up to £300 off auto-applied. May – Oct 2026. Min spend and T&Cs apply. (mock)</p>
-            <div class="btnRow" style="margin-top:0;">
-              <button class="btn primary" id="btnViewDeals">View deals</button>
-              <button class="btn ghost" id="btnBookingsJump">Go to bookings</button>
-            </div>
-          </div>
-        </div>
-
         <div class="sectionRow">
-          <div class="sectionTitle">Upcoming trip</div>
+          <div class="sectionTitle">Need help with your excursion?</div>
           <div class="pillTag">Signed in • Andy Martin</div>
         </div>
 
-        <div class="card bookingCard" id="upcomingCard">
-          <div class="bookingTop">
-            <div style="min-width:0;">
-              <p class="bookingTitle">Cancun, Mexico • Family holiday</p>
-              <p class="bookingMeta">
-                2 Adults, 2 Children • 14 nights<br/>
-                Hotel: Royalton Riviera Cancun (mock)<br/>
-                Dates: 01 Jul 2026 – 15 Jul 2026
-              </p>
-            </div>
-            <div class="bookingBadge">Confirmed</div>
-          </div>
-
-          <div class="infoGrid">
-            <div class="infoTile">
-              <div class="k">Booking ref</div>
-              <div class="v">TUI-MX-482901</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Departure</div>
-              <div class="v">Manchester (MAN)</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Board</div>
-              <div class="v">All Inclusive</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Transfers</div>
-              <div class="v">Included (mock)</div>
-            </div>
-          </div>
-
-          <div class="btnRow" style="margin-top:12px;">
-            <button class="btn primary" id="btnOpenBookings">View booking</button>
-            <button class="btn ghost" id="btnOpenExcursion">View excursion</button>
-          </div>
-        </div>
-
-        <div class="sectionRow" style="margin-top:16px;">
-          <div class="sectionTitle">Need help with your excursion?</div>
-          <div class="pillTag">Virtual Assistant</div>
-        </div>
-
-        <div class="card msgCard">
+        <div class="card">
           <div class="msgHeader">
             <div class="msgHeaderLeft">Thea</div>
             <div class="msgHeaderRight">Just now</div>
@@ -780,24 +504,20 @@
             <div class="avatar">TH</div>
             <div class="bubble">
               <div class="bubbleText">
-                Hi Andy 👋 I can help you check or amend your <b>Sea Turtle & Cenote Snorkelling</b> excursion in Cancun.
+                Hi Andy 👋 I can help you check or amend your <b>Sea Turtle &amp; Cenote Snorkelling</b> excursion in Cancun.
                 Want to <b>change the date</b>, confirm <b>pickup details</b>, or ask a question?
               </div>
 
               <div class="btnRow">
                 <button class="btn primary" id="btnCallNow">📞 Call Thea</button>
-                <button class="btn ghost" id="btnQuickFaq">❓ Ask a question</button>
-                <button class="btn red" id="btnManageXapp">🛠️ Manage booking</button>
+                <button class="btn ghost" id="btnOpenCall">Open call panel</button>
               </div>
 
               <div class="tip">
-                Tip: “Call Thea” opens an in-app WebRTC call. Triggers can show “Click Here” to open xApps.
+                WebRTC is preloaded on page load (NatWest-style) and the “Start call” button enables once ready.
+                Thea’s transcript is merged into one bubble per utterance.
               </div>
             </div>
-          </div>
-
-          <div class="userReplyRow">
-            <div class="userReply">I need to change the date for our snorkelling trip.</div>
           </div>
         </div>
       </div>
@@ -807,62 +527,6 @@
         <div class="navItem"><div class="ico">🔎</div><div>Search</div></div>
         <div class="navItem"><div class="ico">🧾</div><div>Bookings</div></div>
         <div class="navItem"><div class="ico">👤</div><div>Account</div></div>
-      </div>
-
-      <!-- BOOKINGS overlay -->
-      <div class="overlay" id="bookingsOverlay" aria-hidden="true">
-        <div class="sheet">
-          <div class="topBar">
-            <div class="h">Your bookings</div>
-            <button class="btn ghost" id="btnCloseBookings">✕</button>
-          </div>
-
-          <div class="sheetBody">
-            <div class="card bookingCard" style="box-shadow:none;">
-              <div class="bookingTop">
-                <div style="min-width:0;">
-                  <p class="bookingTitle">Cancun, Mexico • Royalton Riviera Cancun</p>
-                  <p class="bookingMeta">
-                    01 Jul 2026 – 15 Jul 2026 • 14 nights<br/>
-                    2 Adults, 2 Children • All Inclusive
-                  </p>
-                </div>
-                <div class="bookingBadge">Confirmed</div>
-              </div>
-
-              <div class="infoGrid">
-                <div class="infoTile"><div class="k">Holiday ref</div><div class="v">TUI-MX-482901</div></div>
-                <div class="infoTile"><div class="k">Resort</div><div class="v">Riviera Maya</div></div>
-                <div class="infoTile"><div class="k">Room</div><div class="v">Family Suite (mock)</div></div>
-                <div class="infoTile"><div class="k">Transfers</div><div class="v">Shared (mock)</div></div>
-              </div>
-
-              <div class="btnRow" style="margin-top:12px;">
-                <button class="btn ghost" id="btnBookingsExcursion">View excursion</button>
-                <button class="btn primary" id="btnBookingsCall">Call Thea</button>
-              </div>
-            </div>
-
-            <div class="card bookingCard" style="box-shadow:none;">
-              <div class="bookingTop">
-                <div style="min-width:0;">
-                  <p class="bookingTitle">Booked excursion • Sea Turtle & Cenote Snorkelling</p>
-                  <p class="bookingMeta">
-                    Booking ref: <b>VTR-717201</b> (mock)<br/>
-                    Current date: <b>2026-07-01</b> • Pickup: <b>Riu Cancun, Hotel lobby</b><br/>
-                    Party: 2 Adults, 2 Children
-                  </p>
-                </div>
-                <div class="bookingBadge" style="border-color:rgba(12,75,158,.18); background:rgba(12,75,158,.08); color:rgba(12,75,158,.95);">Confirmed</div>
-              </div>
-
-              <div class="btnRow" style="margin-top:12px;">
-                <button class="btn red" id="btnBookingsManage">Manage booking</button>
-                <button class="btn ghost" id="btnBookingsClose">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- CALL overlay -->
@@ -899,12 +563,12 @@
             </div>
 
             <div class="card" style="padding:12px; border-radius:22px;">
-              <div style="font-weight:1100; font-size:13px; color:rgba(11,27,58,.92);">Demo notes</div>
+              <div style="font-weight:1100; font-size:13px; color:rgba(11,27,58,.92);">Status</div>
               <div style="margin-top:6px; font-size:12px; font-weight:900; color:rgba(11,27,58,.60); line-height:1.35;">
-                • Thea’s transcript is merged into one bubble per utterance (debounced).<br/>
-                • Auto-scroll stays pinned to bottom as new text arrives.<br/>
-                • The bot can trigger xApps by speaking a phrase (see config below).<br/>
-                • The xApp URL is pulled from ntfy (SSE) and opened in-app.
+                • WebRTC preloads on page load.<br/>
+                • “Start call” enables when the Cognigy call button is detected.<br/>
+                • Thea’s transcript is merged into one box per utterance (debounced).<br/>
+                • Auto-scroll stays pinned to bottom as text arrives.
               </div>
             </div>
           </div>
@@ -915,7 +579,7 @@
       <div class="overlay" id="xappOverlay" aria-hidden="true">
         <div class="sheet" style="padding:0;">
           <div class="topBar" style="margin:0;">
-            <div class="h">Manage your excursion</div>
+            <div class="h">Your options</div>
             <button class="btn ghost" id="btnCloseXapp">✕</button>
           </div>
 
@@ -933,32 +597,21 @@
 
   <script>
     // =========================================================
-    // CONFIG (swap these for your demo)
+    // CONFIG (NatWest-style preload)
     // =========================================================
-
-    // WebRTC widget script
     const WIDGET_SRC = "https://static-trial.cognigy.ai/webrtc/webRTCWidget.js";
 
-    // Replace with YOUR demo WebRTC endpoint
     const COGNIGY_WEBRTC_ENDPOINT_URL =
       "https://endpoint-trial.cognigy.ai/1ef4612c505f7f3d8ac3d4cc2bc0367bc702656498828b1c463ebcf466772406";
 
-    // ===== xApp / ntfy config =====
-    const NTFY_TOPIC = "PASTE_YOUR_NTFY_TOPIC_HERE";
-
-    // Trigger phrases (bot speaks these -> UI reveals Click Here)
-    const XAPP_TRIGGER_PHRASE_1 =
-      "Click here to manage your excursion booking.";
-    const XAPP_TRIGGER_PHRASE_2 =
-      "Click here to confirm the changes to your booking.";
-
+    // (xApp bits left here for future, not required for WebRTC)
+    const NTFY_TOPIC = "tui-xapp-demo-topic"; // change later
+    const XAPP_TRIGGER_PHRASE_1 = "Click here to manage your excursion booking.";
+    const XAPP_TRIGGER_PHRASE_2 = "Click here to confirm the changes to your booking.";
     const FALLBACK_XAPP_URL = "https://example.com";
 
-    // Latest dynamic xApp info (overwritten by ntfy)
     let latestXappUrl = null;
     let latestXappStep = null;
-
-    // CTA state
     let pendingXappStep = null;
     let lastConsumedXappStep = null;
 
@@ -977,7 +630,7 @@
     }
 
     // =========================================================
-    // xApp UI
+    // xApp UI (kept for later use)
     // =========================================================
     function showXappCta(step){
       const area = byId("xappCtaArea");
@@ -990,13 +643,11 @@
       area.style.display = "block";
       updateXappCtaButton();
     }
-
     function hideXappCta(){
       const area = byId("xappCtaArea");
       if (!area) return;
       area.style.display = "none";
     }
-
     function getUrlForPendingStep(){
       if (pendingXappStep != null) {
         if (latestXappUrl && latestXappStep != null && Number(latestXappStep) === Number(pendingXappStep)) {
@@ -1006,13 +657,11 @@
       }
       return latestXappUrl || FALLBACK_XAPP_URL;
     }
-
     function updateXappCtaButton(){
       const btn = byId("btnOpenXapp");
       if (!btn) return;
 
       const url = getUrlForPendingStep() || (pendingXappStep == null ? FALLBACK_XAPP_URL : null);
-
       if (url){
         btn.disabled = false;
         btn.textContent = "Click Here";
@@ -1021,73 +670,56 @@
         btn.textContent = "Loading link…";
       }
     }
-
     function openXappInApp(url){
       const overlay = byId("xappOverlay");
       const frame = byId("xappFrame");
       if (!overlay || !frame) return;
-
       frame.src = url;
       show(overlay);
     }
-
     function closeXapp(){
       const frame = byId("xappFrame");
       if (frame) frame.src = "about:blank";
       hide(byId("xappOverlay"));
     }
 
-    // =========================================================
-    // NTFY subscribe (SSE)
-    // Expects message JSON like: {"type":"xapp","url":"https://...","step":1}
-    // =========================================================
+    // Optional: ntfy subscription (safe if unused)
     function subscribeToNtfy(){
+      if (!NTFY_TOPIC) return;
       const url = `https://ntfy.sh/${NTFY_TOPIC}/sse`;
-      const es = new EventSource(url);
-
-      es.onmessage = (ev) => {
-        try{
-          const envelope = JSON.parse(ev.data);
-          const msg = envelope.message;
-          if (!msg) return;
-
-          const payload = JSON.parse(msg);
-          if (payload?.type !== "xapp") return;
-
-          if (typeof payload.url === "string" && payload.url.trim()){
-            latestXappUrl = payload.url.trim();
-            latestXappStep = payload.step ?? null;
-            updateXappCtaButton();
-            console.log("xApp URL updated:", latestXappUrl, "step:", latestXappStep);
-          }
-        } catch {
-          // ignore parse errors
-        }
-      };
-
-      es.onerror = () => {
-        console.warn("ntfy SSE disconnected (will retry)...");
-      };
-
-      window.__ntfy = es;
+      try{
+        const es = new EventSource(url);
+        es.onmessage = (ev) => {
+          try{
+            const envelope = JSON.parse(ev.data);
+            const msg = envelope.message;
+            if (!msg) return;
+            const payload = JSON.parse(msg);
+            if (payload?.type !== "xapp") return;
+            if (typeof payload.url === "string" && payload.url.trim()){
+              latestXappUrl = payload.url.trim();
+              latestXappStep = payload.step ?? null;
+              updateXappCtaButton();
+            }
+          } catch {}
+        };
+        window.__ntfy = es;
+      } catch {}
     }
 
     // =========================================================
-    // Transcript (MERGED per utterance + auto-scroll) + Names
+    // Transcript (MERGE Thea chunks into one bubble per utterance)
     // =========================================================
     const VA_NAME = "Thea";
     const USER_NAME = "Andy Martin";
-
-    // If new chunks arrive within this window, treat them as the same utterance
     const MERGE_GAP_MS = 650;
 
     let transcriptLines = 0;
-
     let lastTurn = {
       originator: null,     // "user" | "bot"
-      el: null,             // DOM element for last bubble
-      text: "",             // merged text so far
-      timer: null,          // debounce flush timer
+      el: null,
+      text: "",
+      timer: null,
       lastUpdateTs: 0
     };
 
@@ -1120,7 +752,6 @@
     function finalizeTurn(){
       if (lastTurn.timer) clearTimeout(lastTurn.timer);
       lastTurn.timer = null;
-      // hook for future (timestamps, etc.)
     }
 
     function addTranscriptLine(originator, text){
@@ -1177,7 +808,7 @@
 
       if (pinned) scrollTranscriptToBottom();
 
-      // Trigger CTA on merged text (works even if phrase arrives in pieces)
+      // xApp trigger detection on merged text
       if (!isUser) {
         const merged = lastTurn.text || chunk;
         if (merged.includes(XAPP_TRIGGER_PHRASE_1)) {
@@ -1199,7 +830,6 @@
       hideXappCta();
       updateXappCtaButton();
 
-      // reset merge state
       if (lastTurn.timer) clearTimeout(lastTurn.timer);
       lastTurn = { originator:null, el:null, text:"", timer:null, lastUpdateTs:0 };
     }
@@ -1219,7 +849,6 @@
         ws.addEventListener("message", (ev) => {
           const data = ev.data;
           if (typeof data !== "string") return;
-
           if (!data.includes('"_transcription"')) return;
 
           const splitIndex = data.indexOf("\r\n\r\n");
@@ -1258,7 +887,7 @@
     installWebSocketTranscriptionTap();
 
     // =========================================================
-    // Widget loader / init
+    // Widget loader / init (NatWest-style preload)
     // =========================================================
     let widgetScriptLoaded = false;
     let widgetInitialized = false;
@@ -1314,9 +943,7 @@
       }
     }
 
-    // =========================================================
-    // Start/End button discovery
-    // =========================================================
+    // ========= Start/End button discovery (same as NatWest) =========
     function findCognigyStartButton(){
       return (
         document.querySelector('button[data-testid="cognigy-call-button"]') ||
@@ -1404,64 +1031,28 @@
     // UI wiring
     // =========================================================
     document.addEventListener("DOMContentLoaded", () => {
+      // Start listening for xApps immediately (optional)
       subscribeToNtfy();
 
-      // Main CTAs
+      // ✅ NatWest-style: preload WebRTC on page load
+      setStatus("Loading…");
+      preloadForCallUI();
+
+      // Open call overlay
+      byId("btnOpenCall").addEventListener("click", () => show(byId("callOverlay")));
+
+      // “Call Thea” opens overlay then you press “Start call”
       byId("btnCallNow").addEventListener("click", () => {
         show(byId("callOverlay"));
-        setStatus("Loading…");
+        // If preload failed earlier, attempt again:
         preloadForCallUI();
       });
 
-      byId("btnQuickFaq").addEventListener("click", () => {
-        show(byId("callOverlay"));
-        setStatus("Loading…");
-        preloadForCallUI();
-        addTranscriptLine("bot", "Sure — what would you like to know about your excursion?");
-      });
-
-      // “Manage booking” — opens xApp overlay immediately (uses latest URL if published)
-      byId("btnManageXapp").addEventListener("click", () => {
-        const url = latestXappUrl || FALLBACK_XAPP_URL;
-        openXappInApp(url);
-      });
-
-      // Bookings overlay open/close
-      const openBookings = () => show(byId("bookingsOverlay"));
-      const closeBookings = () => hide(byId("bookingsOverlay"));
-
-      byId("btnOpenBookings").addEventListener("click", openBookings);
-      byId("btnBookingsJump").addEventListener("click", openBookings);
-      byId("btnCloseBookings").addEventListener("click", closeBookings);
-      byId("btnBookingsClose").addEventListener("click", closeBookings);
-
-      byId("btnOpenExcursion").addEventListener("click", openBookings);
-
-      byId("btnBookingsExcursion").addEventListener("click", () => {
-        closeBookings();
-        addTranscriptLine("bot", "I can help you change the date, confirm pickup, or check fees. Would you like to call?");
-      });
-
-      byId("btnBookingsCall").addEventListener("click", () => {
-        closeBookings();
-        show(byId("callOverlay"));
-        setStatus("Loading…");
-        preloadForCallUI();
-      });
-
-      byId("btnBookingsManage").addEventListener("click", () => {
-        closeBookings();
-        const url = latestXappUrl || FALLBACK_XAPP_URL;
-        openXappInApp(url);
-      });
-
-      // Close call overlay
       byId("btnCloseCall").addEventListener("click", () => hide(byId("callOverlay")));
       byId("callOverlay").addEventListener("click", (e) => {
         if (e.target === byId("callOverlay")) hide(byId("callOverlay"));
       });
 
-      // Call controls
       byId("btnStartCall").addEventListener("click", () => {
         const ok = startCallSync();
         if (!ok) setStatus("Not ready");
@@ -1472,32 +1063,24 @@
         await endCall();
       });
 
-      // Transcript controls
       byId("btnClearTranscript").addEventListener("click", () => clearTranscript());
 
-      // xApp CTA click: hide immediately + mark consumed
-      byId("btnOpenXapp").addEventListener("click", () => {
+      byId("btnOpenXapp")?.addEventListener("click", () => {
         const url = getUrlForPendingStep() || (pendingXappStep == null ? FALLBACK_XAPP_URL : null);
         if (!url) return;
-
         if (pendingXappStep !== null) lastConsumedXappStep = pendingXappStep;
-
         hideXappCta();
         updateXappCtaButton();
         openXappInApp(url);
       });
 
-      // xApp overlay close
-      byId("btnCloseXapp").addEventListener("click", () => closeXapp());
-      byId("xappOverlay").addEventListener("click", (e) => {
+      byId("btnCloseXapp")?.addEventListener("click", () => closeXapp());
+      byId("xappOverlay")?.addEventListener("click", (e) => {
         if (e.target === byId("xappOverlay")) closeXapp();
       });
 
-      // Cosmetic buttons
-      byId("btnSearch").addEventListener("click", openBookings);
-      byId("btnViewDeals").addEventListener("click", () => alert("Demo: deals screen not implemented in this mock."));
-
-      setStatus("Idle");
+      // Seed with a sample line (optional)
+      // addTranscriptLine("bot", "Hi Andy — I can help you change the date or confirm pickup details.");
       updateTranscriptCount();
       updateXappCtaButton();
     });
