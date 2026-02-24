@@ -76,7 +76,7 @@
       color:rgba(11,27,58,.70);
     }
 
-    /* ✅ TUI logo block (as requested) */
+    /* ✅ TUI logo block */
     .brand{
       justify-self:center;
       display:flex;
@@ -87,16 +87,9 @@
       letter-spacing:.2px;
     }
     .tuiLogo{
-      height:28px;         /* tweak */
+      height:28px;
       width:auto;
       display:block;
-    }
-
-    .brandText{
-      font-size:14px;
-      color:rgba(11,27,58,.92);
-      font-weight:1000;
-      letter-spacing:.2px;
     }
 
     .appbarIcons{
@@ -117,7 +110,7 @@
       color:rgba(11,27,58,.72);
     }
 
-    /* Category row (Holidays / Flights / Experiences ...) */
+    /* Category row */
     .cats{
       display:flex;
       gap:14px;
@@ -671,7 +664,6 @@
         <div class="appbarTop">
           <div class="time">11:07</div>
 
-          <!-- ✅ replaced brandMark with TUI logo image -->
           <div class="brand" title="TUI">
             <img class="tuiLogo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Tui_logo.png" alt="TUI" />
           </div>
@@ -696,7 +688,6 @@
           Search Holidays
         </div>
 
-        <!-- Promo (purely visual placeholder like the real app) -->
         <div class="promoCard" style="margin-bottom:14px;">
           <div class="promoTop">
             <div class="promoLeft">
@@ -807,7 +798,7 @@
         <div class="navItem"><div class="ico">👤</div><div>Account</div></div>
       </div>
 
-      <!-- BOOKINGS overlay (simple “click through upcoming booking” starting point) -->
+      <!-- BOOKINGS overlay -->
       <div class="overlay" id="bookingsOverlay" aria-hidden="true">
         <div class="sheet">
           <div class="topBar">
@@ -936,15 +927,21 @@
     // WebRTC widget script
     const WIDGET_SRC = "https://static-trial.cognigy.ai/webrtc/webRTCWidget.js";
 
-    // ✅ Updated endpoint (your provided value)
+    // Cognigy endpoint
     const COGNIGY_WEBRTC_ENDPOINT_URL =
       "https://endpoint-trial.cognigy.ai/1ef4612c505f7f3d8ac3d4cc2bc0367bc702656498828b1c463ebcf466772406";
 
     // ===== xApp / ntfy config =====
-    const NTFY_TOPIC = "tui-xapp-demo-CHANGE-ME";
+    // ✅ NEW topic for THIS HTML:
+    //   - Subscribe (SSE): https://ntfy.sh/tui-inapp-xapp-andy-20260224/sse
+    //   - Publish (POST):  https://ntfy.sh/tui-inapp-xapp-andy-20260224
+    const NTFY_TOPIC = "tui-inapp-xapp-andy-20260224";
 
+    // ✅ UPDATED trigger phrase (Step 1)
     const XAPP_TRIGGER_PHRASE_1 =
-      "Click here to manage your excursion booking.";
+      "Perfect, give me one moment whilst I pull the tours that best match your preferences.";
+
+    // (kept for optional Step 2)
     const XAPP_TRIGGER_PHRASE_2 =
       "Click here to confirm the changes to your booking.";
 
@@ -968,6 +965,16 @@
       if (!el) return false;
       const r = el.getBoundingClientRect();
       return r.width > 0 && r.height > 0 && getComputedStyle(el).visibility !== "hidden";
+    }
+
+    // =========================================================
+    // Transcript text normalisation
+    // ✅ Swap "Tooee" -> "TUI" in transcript output
+    // =========================================================
+    function normaliseTranscriptText(s){
+      const text = String(s || "");
+      // replace common variants, case-insensitive
+      return text.replace(/\btooee\b/gi, "TUI");
     }
 
     // =========================================================
@@ -1032,7 +1039,8 @@
 
     // =========================================================
     // NTFY subscribe (SSE)
-    // Expects message JSON like: {"type":"xapp","url":"https://...","step":1}
+    // Expects envelope.message containing JSON like:
+    // {"type":"xapp","url":"https://...","step":1,"ts":1730000000000}
     // =========================================================
     function subscribeToNtfy(){
       const url = `https://ntfy.sh/${NTFY_TOPIC}/sse`;
@@ -1067,7 +1075,6 @@
 
     // =========================================================
     // TRANSCRIPT UI (BOT merged into one bubble + auto-scroll pin)
-    // (ported from your Similar App logic)
     // =========================================================
     let transcriptLines = 0;
     let transcriptPinnedToBottom = true;
@@ -1134,8 +1141,11 @@
       if (!list) return;
 
       const who = (originator || "unknown").toLowerCase();
-      const safeText = String(text || "").trim();
-      if (!safeText) return;
+      const rawText = String(text || "").trim();
+      if (!rawText) return;
+
+      // ✅ Apply "Tooee" -> "TUI" before displaying (and before trigger checks)
+      const safeText = normaliseTranscriptText(rawText);
 
       const isUser = who === "user";
 
