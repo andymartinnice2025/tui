@@ -1,4 +1,4 @@
-<!doctype html>
+ <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -83,6 +83,7 @@
       font-weight:1000;
       letter-spacing:.2px;
     }
+    /* Simple placeholder “logo” */
     .brandMark{
       width:34px;height:34px;border-radius:999px;
       background: radial-gradient(60% 60% at 30% 25%, rgba(255,255,255,.7), transparent 60%),
@@ -115,7 +116,7 @@
       color:rgba(11,27,58,.72);
     }
 
-    /* Category row (Holidays / Flights / Experiences ...) */
+    /* Category row */
     .cats{
       display:flex;
       gap:14px;
@@ -625,6 +626,7 @@
       color: rgba(11,27,58,.80);
       box-shadow:0 8px 18px rgba(11,27,58,.06);
       font-weight:900;
+      white-space:pre-wrap;
     }
     .tLine.bot{
       align-self:flex-start;
@@ -652,18 +654,17 @@
       height:100%;
     }
 
+    .tuiLogo{
+      height:28px;         /* tweak */
+      width:auto;
+      display:block;
+}
+
     /* Hide Cognigy launcher visually once we use our own controls */
     .hide-cognigy-launcher button[data-testid="cognigy-call-button"]{
       opacity:0 !important;
       pointer-events:none !important;
     }
-
-    .tuiLogo{
-      height:28px;         /* tweak */
-      width:auto;
-      display:block;
-    }
-    
   </style>
 </head>
 
@@ -675,9 +676,10 @@
         <div class="appbarTop">
           <div class="time">11:07</div>
 
-      <div class="brand" title="TUI">
-        <img class="tuiLogo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/TUI_Logo_2016.svg/960px-TUI_Logo_2016.svg.png" alt="TUI" />
-      </div>
+          <!-- Update this to an <img> if you have a TUI logo URL -->
+          <div class="brand" title="TUI">
+            <img class="tuiLogo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Tui_logo.png" alt="TUI" />
+          </div>
 
           <div class="appbarIcons">
             <div class="iconBtn" id="btnBell" title="Notifications">🔔</div>
@@ -695,11 +697,8 @@
       </div>
 
       <div class="content">
-        <div class="searchPill" id="btnSearch">
-          Search Holidays
-        </div>
+        <div class="searchPill" id="btnSearch">Search Holidays</div>
 
-        <!-- Promo (purely visual placeholder like the real app) -->
         <div class="promoCard" style="margin-bottom:14px;">
           <div class="promoTop">
             <div class="promoLeft">
@@ -773,12 +772,12 @@
 
         <div class="card msgCard">
           <div class="msgHeader">
-            <div class="msgHeaderLeft">TUI Assistant</div>
+            <div class="msgHeaderLeft">Thea</div>
             <div class="msgHeaderRight">Just now</div>
           </div>
 
           <div class="msgBodyRow">
-            <div class="avatar">TUI</div>
+            <div class="avatar">TH</div>
             <div class="bubble">
               <div class="bubbleText">
                 Hi Andy 👋 I can help you check or amend your <b>Sea Turtle & Cenote Snorkelling</b> excursion in Cancun.
@@ -786,13 +785,13 @@
               </div>
 
               <div class="btnRow">
-                <button class="btn primary" id="btnCallNow">📞 Call the assistant</button>
+                <button class="btn primary" id="btnCallNow">📞 Call Thea</button>
                 <button class="btn ghost" id="btnQuickFaq">❓ Ask a question</button>
                 <button class="btn red" id="btnManageXapp">🛠️ Manage booking</button>
               </div>
 
               <div class="tip">
-                Tip: “Call the assistant” opens an in-app WebRTC call. Triggers can show “Click Here” to open xApps.
+                Tip: “Call Thea” opens an in-app WebRTC call. Triggers can show “Click Here” to open xApps.
               </div>
             </div>
           </div>
@@ -810,7 +809,7 @@
         <div class="navItem"><div class="ico">👤</div><div>Account</div></div>
       </div>
 
-      <!-- BOOKINGS overlay (simple “click through upcoming booking” starting point) -->
+      <!-- BOOKINGS overlay -->
       <div class="overlay" id="bookingsOverlay" aria-hidden="true">
         <div class="sheet">
           <div class="topBar">
@@ -840,7 +839,7 @@
 
               <div class="btnRow" style="margin-top:12px;">
                 <button class="btn ghost" id="btnBookingsExcursion">View excursion</button>
-                <button class="btn primary" id="btnBookingsCall">Call assistant</button>
+                <button class="btn primary" id="btnBookingsCall">Call Thea</button>
               </div>
             </div>
 
@@ -894,7 +893,6 @@
 
               <div class="transcriptList" id="transcriptList" aria-live="polite"></div>
 
-              <!-- CTA appears when trigger phrase is spoken -->
               <div id="xappCtaArea" style="margin-top:10px; display:none;">
                 <button class="btn primary" id="btnOpenXapp" disabled>Click Here</button>
               </div>
@@ -903,6 +901,8 @@
             <div class="card" style="padding:12px; border-radius:22px;">
               <div style="font-weight:1100; font-size:13px; color:rgba(11,27,58,.92);">Demo notes</div>
               <div style="margin-top:6px; font-size:12px; font-weight:900; color:rgba(11,27,58,.60); line-height:1.35;">
+                • Thea’s transcript is merged into one bubble per utterance (debounced).<br/>
+                • Auto-scroll stays pinned to bottom as new text arrives.<br/>
                 • The bot can trigger xApps by speaking a phrase (see config below).<br/>
                 • The xApp URL is pulled from ntfy (SSE) and opened in-app.
               </div>
@@ -939,15 +939,12 @@
     // WebRTC widget script
     const WIDGET_SRC = "https://static-trial.cognigy.ai/webrtc/webRTCWidget.js";
 
-    // IMPORTANT:
-    // Replace the below endpoint URL with the WebRTC connection you said you’re sharing for THIS demo.
-    // (Keeping the NatWest value here as a placeholder so the page runs.)
+    // Replace with YOUR demo WebRTC endpoint
     const COGNIGY_WEBRTC_ENDPOINT_URL =
-      "https://endpoint-trial.cognigy.ai/1ef4612c505f7f3d8ac3d4cc2bc0367bc702656498828b1c463ebcf466772406";
+      "PASTE_YOUR_WEBRTC_ENDPOINT_URL_HERE";
 
     // ===== xApp / ntfy config =====
-    // Use your own topic per demo so you can publish xApp links dynamically.
-    const NTFY_TOPIC = "tui-xapp-demo-CHANGE-ME";
+    const NTFY_TOPIC = "PASTE_YOUR_NTFY_TOPIC_HERE";
 
     // Trigger phrases (bot speaks these -> UI reveals Click Here)
     const XAPP_TRIGGER_PHRASE_1 =
@@ -955,7 +952,6 @@
     const XAPP_TRIGGER_PHRASE_2 =
       "Click here to confirm the changes to your booking.";
 
-    // Fallback if nothing published yet
     const FALLBACK_XAPP_URL = "https://example.com";
 
     // Latest dynamic xApp info (overwritten by ntfy)
@@ -989,7 +985,6 @@
 
       pendingXappStep = step;
 
-      // Don't re-show for a step already used
       if (pendingXappStep !== null && pendingXappStep === lastConsumedXappStep) return;
 
       area.style.display = "block";
@@ -1003,7 +998,6 @@
     }
 
     function getUrlForPendingStep(){
-      // Require step match if step is set
       if (pendingXappStep != null) {
         if (latestXappUrl && latestXappStep != null && Number(latestXappStep) === Number(pendingXappStep)) {
           return latestXappUrl;
@@ -1079,9 +1073,23 @@
     }
 
     // =========================================================
-    // Transcript UI
+    // Transcript (MERGED per utterance + auto-scroll) + Names
     // =========================================================
+    const VA_NAME = "Thea";
+    const USER_NAME = "Andy Martin";
+
+    // If new chunks arrive within this window, treat them as the same utterance
+    const MERGE_GAP_MS = 650;
+
     let transcriptLines = 0;
+
+    let lastTurn = {
+      originator: null,     // "user" | "bot"
+      el: null,             // DOM element for last bubble
+      text: "",             // merged text so far
+      timer: null,          // debounce flush timer
+      lastUpdateTs: 0
+    };
 
     function updateTranscriptCount(){
       const el = byId("transcriptCount");
@@ -1089,40 +1097,92 @@
       el.textContent = `${transcriptLines} ${transcriptLines === 1 ? "line" : "lines"}`;
     }
 
+    function isPinnedToBottom(list, thresholdPx = 40){
+      const distanceFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
+      return distanceFromBottom < thresholdPx;
+    }
+
+    function scrollTranscriptToBottom(){
+      const list = byId("transcriptList");
+      if (!list) return;
+      requestAnimationFrame(() => {
+        list.scrollTop = list.scrollHeight;
+      });
+    }
+
+    function normalizeChunk(s){
+      return String(s || "")
+        .replace(/\s+/g, " ")
+        .replace(/\s([,.;!?])/g, "$1")
+        .trim();
+    }
+
+    function finalizeTurn(){
+      if (lastTurn.timer) clearTimeout(lastTurn.timer);
+      lastTurn.timer = null;
+      // hook for future (timestamps, etc.)
+    }
+
     function addTranscriptLine(originator, text){
       const list = byId("transcriptList");
       if (!list) return;
 
       const who = (originator || "unknown").toLowerCase();
-      const safeText = String(text || "").trim();
-      if (!safeText) return;
+      const chunk = normalizeChunk(text);
+      if (!chunk) return;
 
-      const thresholdPx = 24;
-      const distanceFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
-      const wasNearBottom = distanceFromBottom < thresholdPx;
+      const pinned = isPinnedToBottom(list);
 
-      const line = document.createElement("div");
-      line.className = `tLine ${who === "user" ? "user" : "bot"}`;
-      line.textContent = safeText;
+      const now = Date.now();
+      const withinMergeGap = (now - (lastTurn.lastUpdateTs || 0)) <= MERGE_GAP_MS;
 
-      const meta = document.createElement("span");
-      meta.className = "tMeta";
-      meta.textContent = (who === "user") ? "Andy Martin" : "TUI Assistant";
-      line.appendChild(meta);
+      const isUser = (who === "user");
+      const turnKey = isUser ? "user" : "bot";
 
-      list.appendChild(line);
-      transcriptLines += 1;
-      updateTranscriptCount();
+      const shouldMerge =
+        lastTurn.el &&
+        lastTurn.originator === turnKey &&
+        withinMergeGap;
 
-      if (wasNearBottom) {
-        requestAnimationFrame(() => { list.scrollTop = list.scrollHeight; });
+      if (shouldMerge) {
+        const joiner = lastTurn.text ? " " : "";
+        lastTurn.text = (lastTurn.text + joiner + chunk).trim();
+
+        const meta = lastTurn.el.querySelector(".tMeta");
+        lastTurn.el.textContent = lastTurn.text;
+        if (meta) lastTurn.el.appendChild(meta);
+      } else {
+        const line = document.createElement("div");
+        line.className = `tLine ${isUser ? "user" : "bot"}`;
+        line.textContent = chunk;
+
+        const meta = document.createElement("span");
+        meta.className = "tMeta";
+        meta.textContent = isUser ? USER_NAME : VA_NAME;
+        line.appendChild(meta);
+
+        list.appendChild(line);
+        transcriptLines += 1;
+        updateTranscriptCount();
+
+        lastTurn.el = line;
+        lastTurn.originator = turnKey;
+        lastTurn.text = chunk;
       }
 
-      // Show CTA when assistant says either trigger phrase
-      if (who !== "user") {
-        if (safeText.includes(XAPP_TRIGGER_PHRASE_1)) {
+      lastTurn.lastUpdateTs = now;
+
+      if (lastTurn.timer) clearTimeout(lastTurn.timer);
+      lastTurn.timer = setTimeout(finalizeTurn, MERGE_GAP_MS);
+
+      if (pinned) scrollTranscriptToBottom();
+
+      // Trigger CTA on merged text (works even if phrase arrives in pieces)
+      if (!isUser) {
+        const merged = lastTurn.text || chunk;
+        if (merged.includes(XAPP_TRIGGER_PHRASE_1)) {
           showXappCta(1);
-        } else if (safeText.includes(XAPP_TRIGGER_PHRASE_2)) {
+        } else if (merged.includes(XAPP_TRIGGER_PHRASE_2)) {
           showXappCta(2);
         }
       }
@@ -1138,6 +1198,10 @@
       lastConsumedXappStep = null;
       hideXappCta();
       updateXappCtaButton();
+
+      // reset merge state
+      if (lastTurn.timer) clearTimeout(lastTurn.timer);
+      lastTurn = { originator:null, el:null, text:"", timer:null, lastUpdateTs:0 };
     }
 
     // =========================================================
@@ -1340,7 +1404,6 @@
     // UI wiring
     // =========================================================
     document.addEventListener("DOMContentLoaded", () => {
-      // xApp updates immediately
       subscribeToNtfy();
 
       // Main CTAs
@@ -1351,7 +1414,6 @@
       });
 
       byId("btnQuickFaq").addEventListener("click", () => {
-        // lightweight fake “question” for demo
         show(byId("callOverlay"));
         setStatus("Loading…");
         preloadForCallUI();
@@ -1373,19 +1435,20 @@
       byId("btnCloseBookings").addEventListener("click", closeBookings);
       byId("btnBookingsClose").addEventListener("click", closeBookings);
 
-      // From bookings -> excursion / call / manage
       byId("btnOpenExcursion").addEventListener("click", openBookings);
+
       byId("btnBookingsExcursion").addEventListener("click", () => {
         closeBookings();
-        // For now, just show the assistant card area; your future xApp could be launched here instead.
         addTranscriptLine("bot", "I can help you change the date, confirm pickup, or check fees. Would you like to call?");
       });
+
       byId("btnBookingsCall").addEventListener("click", () => {
         closeBookings();
         show(byId("callOverlay"));
         setStatus("Loading…");
         preloadForCallUI();
       });
+
       byId("btnBookingsManage").addEventListener("click", () => {
         closeBookings();
         const url = latestXappUrl || FALLBACK_XAPP_URL;
@@ -1409,6 +1472,7 @@
         await endCall();
       });
 
+      // Transcript controls
       byId("btnClearTranscript").addEventListener("click", () => clearTranscript());
 
       // xApp CTA click: hide immediately + mark consumed
@@ -1430,13 +1494,8 @@
       });
 
       // Cosmetic buttons
-      byId("btnSearch").addEventListener("click", () => {
-        // Demo-only: nudge user into the booking area
-        openBookings();
-      });
-      byId("btnViewDeals").addEventListener("click", () => {
-        alert("Demo: deals screen not implemented in this mock.");
-      });
+      byId("btnSearch").addEventListener("click", openBookings);
+      byId("btnViewDeals").addEventListener("click", () => alert("Demo: deals screen not implemented in this mock."));
 
       setStatus("Idle");
       updateTranscriptCount();
