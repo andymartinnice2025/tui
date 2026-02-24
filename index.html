@@ -7,7 +7,6 @@
 
   <style>
     :root{
-      /* TUI-ish palette (approx) */
       --tui-red:#D81E27;
       --tui-ink:#0B1B3A;
       --tui-ink-2:#1E2A55;
@@ -18,14 +17,15 @@
       --tui-blue:#0C4B9E;
       --tui-blue-2:#0A3E86;
       --tui-soft:#EEF4FF;
-      --shadow:0 18px 48px rgba(11,27,58,.14);
       --shadow-soft:0 12px 28px rgba(11,27,58,.10);
-      --radius:22px;
       --radius2:28px;
       --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
     }
 
     *{ box-sizing:border-box; }
+    html, body { height: 100%; }
+
+    /* ✅ Lock page so injected widget UI cannot create extra scroll/duplicate-looking layout */
     body{
       margin:0;
       font-family:var(--font);
@@ -35,6 +35,7 @@
       place-items:center;
       padding:22px;
       color:var(--tui-ink);
+      overflow:hidden; /* IMPORTANT */
     }
 
     /* Phone frame */
@@ -46,6 +47,7 @@
       padding:14px;
       box-shadow:0 34px 90px rgba(0,0,0,.35);
       position:relative;
+      overflow:hidden;
     }
     .screen{
       height:100%;
@@ -75,8 +77,6 @@
       font-size:12px;
       color:rgba(11,27,58,.70);
     }
-
-    /* ✅ TUI logo block */
     .brand{
       justify-self:center;
       display:flex;
@@ -86,12 +86,7 @@
       font-weight:1000;
       letter-spacing:.2px;
     }
-    .tuiLogo{
-      height:28px;
-      width:auto;
-      display:block;
-    }
-
+    .tuiLogo{ height:28px; width:auto; display:block; }
     .appbarIcons{
       justify-self:end;
       display:flex;
@@ -119,7 +114,6 @@
       scrollbar-width:none;
     }
     .cats::-webkit-scrollbar{ display:none; }
-
     .cat{
       min-width:78px;
       display:flex;
@@ -154,6 +148,7 @@
       flex:1;
       overflow:auto;
       padding:14px 14px 96px;
+      -webkit-overflow-scrolling: touch;
     }
 
     .searchPill{
@@ -298,11 +293,7 @@
       color:rgba(11,27,58,.82);
       box-shadow:none;
     }
-    .btn:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      box-shadow:none;
-    }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; box-shadow:none; }
 
     .sectionRow{
       display:flex;
@@ -330,10 +321,7 @@
     }
 
     /* Booking summary card */
-    .bookingCard{
-      padding:14px;
-      border-radius:26px;
-    }
+    .bookingCard{ padding:14px; border-radius:26px; }
     .bookingTop{
       display:flex;
       justify-content:space-between;
@@ -365,7 +353,6 @@
       font-size:12px;
       white-space:nowrap;
     }
-
     .infoGrid{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -393,10 +380,7 @@
     }
 
     /* “Message” style assistant card */
-    .msgCard{
-      padding:14px;
-      border-radius:26px;
-    }
+    .msgCard{ padding:14px; border-radius:26px; }
     .msgHeader{
       display:flex;
       justify-content:space-between;
@@ -413,11 +397,7 @@
       font-weight:1000;
       color: rgba(11,27,58,.55);
     }
-    .msgBodyRow{
-      display:flex;
-      gap:12px;
-      align-items:flex-end;
-    }
+    .msgBodyRow{ display:flex; gap:12px; align-items:flex-end; }
     .avatar{
       width:44px;height:44px;border-radius:16px;
       display:grid;place-items:center;
@@ -450,12 +430,7 @@
       line-height:1.35;
       font-weight:900;
     }
-
-    .userReplyRow{
-      margin-top:12px;
-      display:flex;
-      justify-content:flex-end;
-    }
+    .userReplyRow{ margin-top:12px; display:flex; justify-content:flex-end; }
     .userReply{
       max-width:78%;
       background: rgba(12,75,158,.10);
@@ -557,7 +532,7 @@
       flex-direction:column;
       gap:12px;
       min-height:0;
-      overflow:hidden; /* important: transcript scroll stays inside */
+      overflow:hidden;
     }
     .transcriptCardGrow{
       flex:1;
@@ -633,16 +608,25 @@
     }
 
     /* xApp iframe */
-    #xappFrame{
-      border:0;
-      width:100%;
-      height:100%;
+    #xappFrame{ border:0; width:100%; height:100%; }
+
+    /* ✅ Quarantine area (widget UI will be moved here so it cannot affect layout) */
+    #widgetQuarantine{
+      position:absolute;
+      left:-99999px;
+      top:-99999px;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      opacity:0;
+      pointer-events:none;
     }
 
-    /* Hide Cognigy launcher visually once we use our own controls */
-    .hide-cognigy-launcher button[data-testid="cognigy-call-button"]{
-      opacity:0 !important;
-      pointer-events:none !important;
+    /* ✅ Extra defensive: if widget tries to show containers, hide them */
+    .webrtc_widget, .webrtc_widget_container, [class*="webrtc_widget" i]{
+      max-width:1px !important;
+      max-height:1px !important;
+      overflow:hidden !important;
     }
   </style>
 </head>
@@ -651,14 +635,15 @@
   <div class="phone">
     <div class="screen">
 
+      <!-- ✅ hidden container for quarantined widget DOM -->
+      <div id="widgetQuarantine" aria-hidden="true"></div>
+
       <div class="appbar">
         <div class="appbarTop">
           <div class="time">11:07</div>
-
           <div class="brand" title="TUI">
             <img class="tuiLogo" src="https://upload.wikimedia.org/wikipedia/commons/b/bb/Tui_logo.png" alt="TUI" />
           </div>
-
           <div class="appbarIcons">
             <div class="iconBtn" id="btnBell" title="Notifications">🔔</div>
           </div>
@@ -675,9 +660,7 @@
       </div>
 
       <div class="content">
-        <div class="searchPill" id="btnSearch">
-          Search Holidays
-        </div>
+        <div class="searchPill" id="btnSearch">Search Holidays</div>
 
         <div class="promoCard" style="margin-bottom:14px;">
           <div class="promoTop">
@@ -721,22 +704,10 @@
           </div>
 
           <div class="infoGrid">
-            <div class="infoTile">
-              <div class="k">Booking ref</div>
-              <div class="v">TUI-MX-482901</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Departure</div>
-              <div class="v">Manchester (MAN)</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Board</div>
-              <div class="v">All Inclusive</div>
-            </div>
-            <div class="infoTile">
-              <div class="k">Transfers</div>
-              <div class="v">Included (mock)</div>
-            </div>
+            <div class="infoTile"><div class="k">Booking ref</div><div class="v">TUI-MX-482901</div></div>
+            <div class="infoTile"><div class="k">Departure</div><div class="v">Manchester (MAN)</div></div>
+            <div class="infoTile"><div class="k">Board</div><div class="v">All Inclusive</div></div>
+            <div class="infoTile"><div class="k">Transfers</div><div class="v">Included (mock)</div></div>
           </div>
 
           <div class="btnRow" style="margin-top:12px;">
@@ -853,7 +824,7 @@
             <button class="btn ghost" id="btnCloseCall">✕</button>
           </div>
 
-          <!-- ✅ Removed: WebRTC status strip + Demo notes -->
+          <!-- ✅ Removed status strip + demo notes -->
           <div class="sheetBody sheetBodyCall">
             <div class="btnRow" style="margin:0;">
               <button class="btn primary" id="btnStartCall" disabled>Start call</button>
@@ -869,7 +840,6 @@
 
               <div class="transcriptList" id="transcriptList" aria-live="polite"></div>
 
-              <!-- CTA appears when trigger phrase is spoken -->
               <div id="xappCtaArea" style="margin-top:10px; display:none;">
                 <button class="btn primary" id="btnOpenXapp" disabled>Click Here</button>
               </div>
@@ -887,10 +857,7 @@
           </div>
 
           <div style="flex:1; min-height:0;">
-            <iframe
-              id="xappFrame"
-              sandbox="allow-scripts allow-forms allow-same-origin allow-popups">
-            </iframe>
+            <iframe id="xappFrame" sandbox="allow-scripts allow-forms allow-same-origin allow-popups"></iframe>
           </div>
         </div>
       </div>
@@ -906,16 +873,16 @@
     const COGNIGY_WEBRTC_ENDPOINT_URL =
       "https://endpoint-trial.cognigy.ai/1ef4612c505f7f3d8ac3d4cc2bc0367bc702656498828b1c463ebcf466772406";
 
-    // ntfy topic for this HTML
-    // Subscribe: https://ntfy.sh/tui-inapp-xapp-andy-20260224/sse
+    // ✅ ntfy for this HTML
     // Publish:   https://ntfy.sh/tui-inapp-xapp-andy-20260224
+    // Subscribe: https://ntfy.sh/tui-inapp-xapp-andy-20260224/sse
     const NTFY_TOPIC = "tui-inapp-xapp-andy-20260224";
 
-    // Trigger phrase (Step 1)
+    // ✅ Trigger phrase (Step 1)
     const XAPP_TRIGGER_PHRASE_1 =
       "Perfect, give me one moment whilst I pull the tours that best match your preferences.";
 
-    // Optional Step 2 trigger (keep if you ever want it)
+    // Optional Step 2
     const XAPP_TRIGGER_PHRASE_2 =
       "Click here to confirm the changes to your booking.";
 
@@ -923,7 +890,6 @@
 
     let latestXappUrl = null;
     let latestXappStep = null;
-
     let pendingXappStep = null;
     let lastConsumedXappStep = null;
 
@@ -941,8 +907,42 @@
     }
 
     // =========================================================
+    // ✅ Widget DOM quarantine (prevents page duplication / stray text)
+    // Moves any injected widget containers into #widgetQuarantine
+    // =========================================================
+    function quarantineCognigyDom(){
+      const q = byId("widgetQuarantine");
+      if (!q) return;
+
+      const candidates = [
+        ".webrtc_widget",
+        ".webrtc_widget_container",
+        "[class*='webrtc_widget' i]",
+        "button[data-testid='cognigy-call-button']",
+        "button[aria-label='Start a call']",
+      ];
+
+      for (const sel of candidates){
+        document.querySelectorAll(sel).forEach((node) => {
+          // If it's the button itself, move its parent container too (often the UI wrapper)
+          const container = node.closest(".webrtc_widget_container") || node.closest(".webrtc_widget") || node.parentElement;
+          if (!container) return;
+          if (q.contains(container)) return;
+          try { q.appendChild(container); } catch {}
+        });
+      }
+    }
+
+    function startQuarantineObserver(){
+      const obs = new MutationObserver(() => quarantineCognigyDom());
+      obs.observe(document.body, { childList:true, subtree:true });
+      quarantineCognigyDom();
+      window.__quarantineObs = obs;
+    }
+
+    // =========================================================
     // Transcript text normalisation
-    // Swap "Tooee" -> "TUI"
+    // ✅ Swap "Tooee" -> "TUI"
     // =========================================================
     function normaliseTranscriptText(s){
       const text = String(s || "");
@@ -1011,7 +1011,7 @@
 
     // =========================================================
     // NTFY subscribe (SSE)
-    // Expects envelope.message JSON like:
+    // Envelope contains a string envelope.message which itself is JSON:
     // {"type":"xapp","step":1,"url":"https://...","ts":1730000000000}
     // =========================================================
     function subscribeToNtfy(){
@@ -1031,22 +1031,17 @@
             latestXappUrl = payload.url.trim();
             latestXappStep = payload.step ?? null;
             updateXappCtaButton();
-            console.log("xApp URL updated:", latestXappUrl, "step:", latestXappStep);
           }
         } catch {
-          // ignore parse errors
+          // ignore
         }
-      };
-
-      es.onerror = () => {
-        console.warn("ntfy SSE disconnected (will retry)...");
       };
 
       window.__ntfy = es;
     }
 
     // =========================================================
-    // TRANSCRIPT UI
+    // Transcript UI
     // =========================================================
     let transcriptLines = 0;
     let transcriptPinnedToBottom = true;
@@ -1061,10 +1056,7 @@
       el.textContent = `${transcriptLines} ${transcriptLines === 1 ? "line" : "lines"}`;
     }
 
-    function _scrollToBottom(list){
-      list.scrollTop = list.scrollHeight;
-    }
-
+    function _scrollToBottom(list){ list.scrollTop = list.scrollHeight; }
     function _scrollToBottomIfPinned(list){
       if (!transcriptPinnedToBottom) return;
       requestAnimationFrame(() => _scrollToBottom(list));
@@ -1113,16 +1105,14 @@
       if (!list) return;
 
       const who = (originator || "unknown").toLowerCase();
-      const rawText = String(text || "").trim();
-      if (!rawText) return;
+      const raw = String(text || "").trim();
+      if (!raw) return;
 
-      const safeText = normaliseTranscriptText(rawText);
-
+      const safeText = normaliseTranscriptText(raw);
       const isUser = who === "user";
 
       if (isUser) {
         _flushBotBubble();
-
         const { line } = _createLineEl("user", safeText, "Andy Martin");
         list.appendChild(line);
         transcriptLines += 1;
@@ -1157,7 +1147,6 @@
         lastBotBubbleEl.insertBefore(document.createTextNode(""), lastBotMetaEl);
       }
       lastBotBubbleEl.firstChild.nodeValue = lastBotText;
-
       if (lastBotMetaEl) lastBotMetaEl.textContent = botLabel;
 
       _scrollToBottomIfPinned(list);
@@ -1179,7 +1168,7 @@
     }
 
     // =========================================================
-    // WebSocket tap: captures SIP INFO frames with JSON _transcription
+    // WebSocket transcription tap
     // =========================================================
     function installWebSocketTranscriptionTap(){
       if (window.__wsTapInstalled) return;
@@ -1193,7 +1182,6 @@
         ws.addEventListener("message", (ev) => {
           const data = ev.data;
           if (typeof data !== "string") return;
-
           if (!data.includes('"_transcription"')) return;
 
           const splitIndex = data.indexOf("\r\n\r\n");
@@ -1214,9 +1202,7 @@
                 addTranscriptLine(originator, m.text.trim());
               }
             }
-          } catch {
-            // ignore
-          }
+          } catch {}
         });
 
         return ws;
@@ -1269,23 +1255,20 @@
 
       try{
         await loadScript(12000);
-
-        if (typeof window.initWebRTCWidget !== "function") {
-          return false;
-        }
+        if (typeof window.initWebRTCWidget !== "function") return false;
 
         window.initWebRTCWidget(COGNIGY_WEBRTC_ENDPOINT_URL);
-
         widgetInitialized = true;
+
+        // quarantine any injected DOM asap
+        quarantineCognigyDom();
+
         return true;
       } catch {
         return false;
       }
     }
 
-    // =========================================================
-    // Start/End button discovery
-    // =========================================================
     function findCognigyStartButton(){
       return (
         document.querySelector('button[data-testid="cognigy-call-button"]') ||
@@ -1313,6 +1296,7 @@
         if (immediate) return resolve(immediate);
 
         const obs = new MutationObserver(() => {
+          quarantineCognigyDom();
           const btn = findCognigyStartButton();
           if (btn) { obs.disconnect(); resolve(btn); }
         });
@@ -1330,17 +1314,14 @@
       if (!ok) return;
 
       const btn = await waitForStartButton(10000);
-      if (btn) {
-        byId("btnStartCall").disabled = false;
-        document.documentElement.classList.add("hide-cognigy-launcher");
-      }
+      if (btn) byId("btnStartCall").disabled = false;
     }
 
     function startCallSync(){
       const btn = findCognigyStartButton();
       if (!btn) return false;
       btn.click();
-      document.documentElement.classList.add("hide-cognigy-launcher");
+      quarantineCognigyDom();
       return true;
     }
 
@@ -1352,12 +1333,8 @@
           return true;
         }
       } catch {}
-
       const endBtn = findCognigyEndButton();
-      if (endBtn && isVisible(endBtn)) {
-        endBtn.click();
-        return true;
-      }
+      if (endBtn && isVisible(endBtn)) { endBtn.click(); return true; }
       return false;
     }
 
@@ -1366,8 +1343,8 @@
     // =========================================================
     document.addEventListener("DOMContentLoaded", () => {
       _setupTranscriptScrollPin();
-
       subscribeToNtfy();
+      startQuarantineObserver();  // ✅ keeps injected widget UI contained
 
       byId("btnCallNow").addEventListener("click", () => {
         show(byId("callOverlay"));
@@ -1396,7 +1373,7 @@
       byId("btnOpenExcursion").addEventListener("click", openBookings);
       byId("btnBookingsExcursion").addEventListener("click", () => {
         closeBookings();
-        addTranscriptLine("bot", "I can help you change the date, confirm pickup, or check fees. Would you like to call?");
+        addTranscriptLine("bot", "I can help with that. Would you like to call?");
       });
       byId("btnBookingsCall").addEventListener("click", () => {
         closeBookings();
@@ -1419,18 +1396,13 @@
         if (!ok) alert("Not ready yet — WebRTC widget button not found.");
       });
 
-      byId("btnEndCall").addEventListener("click", async () => {
-        await endCall();
-      });
-
+      byId("btnEndCall").addEventListener("click", async () => { await endCall(); });
       byId("btnClearTranscript").addEventListener("click", () => clearTranscript());
 
       byId("btnOpenXapp").addEventListener("click", () => {
         const url = getUrlForPendingStep() || (pendingXappStep == null ? FALLBACK_XAPP_URL : null);
         if (!url) return;
-
         if (pendingXappStep !== null) lastConsumedXappStep = pendingXappStep;
-
         hideXappCta();
         updateXappCtaButton();
         openXappInApp(url);
@@ -1441,12 +1413,8 @@
         if (e.target === byId("xappOverlay")) closeXapp();
       });
 
-      byId("btnSearch").addEventListener("click", () => {
-        openBookings();
-      });
-      byId("btnViewDeals").addEventListener("click", () => {
-        alert("Demo: deals screen not implemented in this mock.");
-      });
+      byId("btnSearch").addEventListener("click", openBookings);
+      byId("btnViewDeals").addEventListener("click", () => alert("Demo: deals screen not implemented in this mock."));
 
       updateTranscriptCount();
       updateXappCtaButton();
