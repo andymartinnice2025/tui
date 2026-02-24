@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TUI Mock – In-App Virtual Assistant Call (WebRTC) + Live Transcription + xApp Overlay</title>
+  <title>TUI Mock – In-App Virtual Assistant Call (WebRTC) + Live Transcription + Tours Overlay</title>
 
   <style>
     :root{
@@ -25,7 +25,7 @@
     *{ box-sizing:border-box; }
     html, body { height: 100%; }
 
-    /* ✅ Lock page so injected widget UI cannot create extra scroll/duplicate-looking layout */
+    /* Lock page so injected widget UI cannot create extra scroll */
     body{
       margin:0;
       font-family:var(--font);
@@ -35,7 +35,7 @@
       place-items:center;
       padding:22px;
       color:var(--tui-ink);
-      overflow:hidden; /* IMPORTANT */
+      overflow:hidden;
     }
 
     /* Phone frame */
@@ -526,7 +526,7 @@
       min-height:0;
     }
 
-    /* ✅ Call overlay layout: buttons + transcript fills space */
+    /* Call overlay layout */
     .sheetBodyCall{
       display:flex;
       flex-direction:column;
@@ -610,7 +610,7 @@
     /* xApp iframe */
     #xappFrame{ border:0; width:100%; height:100%; }
 
-    /* ✅ Quarantine area (widget UI will be moved here so it cannot affect layout) */
+    /* Widget quarantine area */
     #widgetQuarantine{
       position:absolute;
       left:-99999px;
@@ -621,8 +621,6 @@
       opacity:0;
       pointer-events:none;
     }
-
-    /* ✅ Extra defensive: if widget tries to show containers, hide them */
     .webrtc_widget, .webrtc_widget_container, [class*="webrtc_widget" i]{
       max-width:1px !important;
       max-height:1px !important;
@@ -635,7 +633,6 @@
   <div class="phone">
     <div class="screen">
 
-      <!-- ✅ hidden container for quarantined widget DOM -->
       <div id="widgetQuarantine" aria-hidden="true"></div>
 
       <div class="appbar">
@@ -712,12 +709,13 @@
 
           <div class="btnRow" style="margin-top:12px;">
             <button class="btn primary" id="btnOpenBookings">View booking</button>
-            <button class="btn ghost" id="btnOpenExcursion">View excursion</button>
+            <button class="btn ghost" id="btnOpenHolidayDetails">Holiday details</button>
           </div>
         </div>
 
+        <!-- ✅ UPDATED SECTION (no excursion) -->
         <div class="sectionRow" style="margin-top:16px;">
-          <div class="sectionTitle">Need help with your excursion?</div>
+          <div class="sectionTitle">Need help planning your holiday?</div>
           <div class="pillTag">Virtual Assistant</div>
         </div>
 
@@ -731,24 +729,25 @@
             <div class="avatar">TUI</div>
             <div class="bubble">
               <div class="bubbleText">
-                Hi Andy 👋 I can help you check or amend your <b>Sea Turtle & Cenote Snorkelling</b> excursion in Cancun.
-                Want to <b>change the date</b>, confirm <b>pickup details</b>, or ask a question?
+                Hi Andy 👋 I can help you get ready for your <b>Cancun</b> holiday — things like <b>airport transfers</b>,
+                <b>luggage guidance</b>, <b>hotel info</b>, or I can <b>recommend tours</b> that match your preferences.
+                What would you like to do?
               </div>
 
               <div class="btnRow">
                 <button class="btn primary" id="btnCallNow">📞 Call Thea</button>
                 <button class="btn ghost" id="btnQuickFaq">❓ Ask a question</button>
-                <button class="btn red" id="btnManageXapp">🛠️ Manage booking</button>
+                <button class="btn red" id="btnManageXapp">🗺️ Browse tours</button>
               </div>
 
               <div class="tip">
-                Tip: “Call Thea” opens an in-app WebRTC call. Triggers can show “Click Here” to open xApps.
+                Tip: During the call, Thea can trigger “Click Here” to open recommended tours.
               </div>
             </div>
           </div>
 
           <div class="userReplyRow">
-            <div class="userReply">I need to change the date for our snorkelling trip.</div>
+            <div class="userReply">Can you recommend some tours for us?</div>
           </div>
         </div>
       </div>
@@ -785,33 +784,35 @@
                 <div class="infoTile"><div class="k">Holiday ref</div><div class="v">TUI-MX-482901</div></div>
                 <div class="infoTile"><div class="k">Resort</div><div class="v">Riviera Maya</div></div>
                 <div class="infoTile"><div class="k">Room</div><div class="v">Family Suite (mock)</div></div>
-                <div class="infoTile"><div class="k">Transfers</div><div class="v">Shared (mock)</div></div>
+                <div class="infoTile"><div class="k">Transfers</div><div class="v">Included (mock)</div></div>
               </div>
 
               <div class="btnRow" style="margin-top:12px;">
-                <button class="btn ghost" id="btnBookingsExcursion">View excursion</button>
+                <button class="btn ghost" id="btnBookingsDetails">Holiday details</button>
                 <button class="btn primary" id="btnBookingsCall">Call Thea</button>
+                <button class="btn red" id="btnBookingsTours">Browse tours</button>
               </div>
             </div>
 
+            <!-- ✅ Removed booked excursion card; replaced with a simple “Extras” style block -->
             <div class="card bookingCard" style="box-shadow:none;">
               <div class="bookingTop">
                 <div style="min-width:0;">
-                  <p class="bookingTitle">Booked excursion • Sea Turtle & Cenote Snorkelling</p>
+                  <p class="bookingTitle">Extras & add-ons</p>
                   <p class="bookingMeta">
-                    Booking ref: <b>VTR-717201</b> (mock)<br/>
-                    Current date: <b>2026-07-01</b> • Pickup: <b>Riu Cancun, Hotel lobby</b><br/>
-                    Party: 2 Adults, 2 Children
+                    You haven’t booked any tours yet.<br/>
+                    Want recommendations based on your preferences and travel party?
                   </p>
                 </div>
-                <div class="bookingBadge" style="border-color:rgba(12,75,158,.18); background:rgba(12,75,158,.08); color:rgba(12,75,158,.95);">Confirmed</div>
+                <div class="bookingBadge" style="border-color:rgba(12,75,158,.18); background:rgba(12,75,158,.08); color:rgba(12,75,158,.95);">Optional</div>
               </div>
 
               <div class="btnRow" style="margin-top:12px;">
-                <button class="btn red" id="btnBookingsManage">Manage booking</button>
+                <button class="btn red" id="btnBookingsRecommend">Get recommendations</button>
                 <button class="btn ghost" id="btnBookingsClose">Close</button>
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -824,7 +825,6 @@
             <button class="btn ghost" id="btnCloseCall">✕</button>
           </div>
 
-          <!-- ✅ Removed status strip + demo notes -->
           <div class="sheetBody sheetBodyCall">
             <div class="btnRow" style="margin:0;">
               <button class="btn primary" id="btnStartCall" disabled>Start call</button>
@@ -848,11 +848,11 @@
         </div>
       </div>
 
-      <!-- xApp overlay -->
+      <!-- xApp overlay (now “Recommended tours”) -->
       <div class="overlay" id="xappOverlay" aria-hidden="true">
         <div class="sheet" style="padding:0;">
           <div class="topBar" style="margin:0;">
-            <div class="h">Manage your excursion</div>
+            <div class="h">Recommended tours</div>
             <button class="btn ghost" id="btnCloseXapp">✕</button>
           </div>
 
@@ -873,16 +873,16 @@
     const COGNIGY_WEBRTC_ENDPOINT_URL =
       "https://endpoint-trial.cognigy.ai/1ef4612c505f7f3d8ac3d4cc2bc0367bc702656498828b1c463ebcf466772406";
 
-    // ✅ ntfy for this HTML
+    // ntfy
     // Publish:   https://ntfy.sh/tui-inapp-xapp-andy-20260224
     // Subscribe: https://ntfy.sh/tui-inapp-xapp-andy-20260224/sse
     const NTFY_TOPIC = "tui-inapp-xapp-andy-20260224";
 
-    // ✅ Trigger phrase (Step 1)
+    // Trigger phrase (Step 1)
     const XAPP_TRIGGER_PHRASE_1 =
       "Perfect, give me one moment whilst I pull the tours that best match your preferences.";
 
-    // Optional Step 2
+    // Optional Step 2 (kept)
     const XAPP_TRIGGER_PHRASE_2 =
       "Click here to confirm the changes to your booking.";
 
@@ -907,8 +907,7 @@
     }
 
     // =========================================================
-    // ✅ Widget DOM quarantine (prevents page duplication / stray text)
-    // Moves any injected widget containers into #widgetQuarantine
+    // Widget DOM quarantine
     // =========================================================
     function quarantineCognigyDom(){
       const q = byId("widgetQuarantine");
@@ -924,7 +923,6 @@
 
       for (const sel of candidates){
         document.querySelectorAll(sel).forEach((node) => {
-          // If it's the button itself, move its parent container too (often the UI wrapper)
           const container = node.closest(".webrtc_widget_container") || node.closest(".webrtc_widget") || node.parentElement;
           if (!container) return;
           if (q.contains(container)) return;
@@ -941,8 +939,7 @@
     }
 
     // =========================================================
-    // Transcript text normalisation
-    // ✅ Swap "Tooee" -> "TUI"
+    // Transcript normalisation (Tooee -> TUI)
     // =========================================================
     function normaliseTranscriptText(s){
       const text = String(s || "");
@@ -1011,8 +1008,6 @@
 
     // =========================================================
     // NTFY subscribe (SSE)
-    // Envelope contains a string envelope.message which itself is JSON:
-    // {"type":"xapp","step":1,"url":"https://...","ts":1730000000000}
     // =========================================================
     function subscribeToNtfy(){
       const url = `https://ntfy.sh/${NTFY_TOPIC}/sse`;
@@ -1032,9 +1027,7 @@
             latestXappStep = payload.step ?? null;
             updateXappCtaButton();
           }
-        } catch {
-          // ignore
-        }
+        } catch {}
       };
 
       window.__ntfy = es;
@@ -1259,10 +1252,7 @@
 
         window.initWebRTCWidget(COGNIGY_WEBRTC_ENDPOINT_URL);
         widgetInitialized = true;
-
-        // quarantine any injected DOM asap
         quarantineCognigyDom();
-
         return true;
       } catch {
         return false;
@@ -1344,8 +1334,9 @@
     document.addEventListener("DOMContentLoaded", () => {
       _setupTranscriptScrollPin();
       subscribeToNtfy();
-      startQuarantineObserver();  // ✅ keeps injected widget UI contained
+      startQuarantineObserver();
 
+      // Call / FAQ
       byId("btnCallNow").addEventListener("click", () => {
         show(byId("callOverlay"));
         preloadForCallUI();
@@ -1354,14 +1345,16 @@
       byId("btnQuickFaq").addEventListener("click", () => {
         show(byId("callOverlay"));
         preloadForCallUI();
-        addTranscriptLine("bot", "Sure — what would you like to know about your excursion?");
+        addTranscriptLine("bot", "Sure — what would you like to know about your holiday?");
       });
 
+      // Browse tours (open overlay immediately with latest URL if available)
       byId("btnManageXapp").addEventListener("click", () => {
         const url = latestXappUrl || FALLBACK_XAPP_URL;
         openXappInApp(url);
       });
 
+      // Bookings overlay
       const openBookings = () => show(byId("bookingsOverlay"));
       const closeBookings = () => hide(byId("bookingsOverlay"));
 
@@ -1370,49 +1363,63 @@
       byId("btnCloseBookings").addEventListener("click", closeBookings);
       byId("btnBookingsClose").addEventListener("click", closeBookings);
 
-      byId("btnOpenExcursion").addEventListener("click", openBookings);
-      byId("btnBookingsExcursion").addEventListener("click", () => {
+      // Booking actions
+      byId("btnOpenHolidayDetails").addEventListener("click", openBookings);
+      byId("btnBookingsDetails").addEventListener("click", () => {
         closeBookings();
-        addTranscriptLine("bot", "I can help with that. Would you like to call?");
+        addTranscriptLine("bot", "I can help with hotel info, transfers, and travel tips. Do you want to call?");
       });
       byId("btnBookingsCall").addEventListener("click", () => {
         closeBookings();
         show(byId("callOverlay"));
         preloadForCallUI();
       });
-      byId("btnBookingsManage").addEventListener("click", () => {
+      byId("btnBookingsTours").addEventListener("click", () => {
         closeBookings();
         const url = latestXappUrl || FALLBACK_XAPP_URL;
         openXappInApp(url);
       });
+      byId("btnBookingsRecommend").addEventListener("click", () => {
+        closeBookings();
+        show(byId("callOverlay"));
+        preloadForCallUI();
+        addTranscriptLine("bot", "Tell me what you enjoy, and I’ll recommend the best tours for your Cancun holiday.");
+      });
+      byId("btnBookingsRecommend").addEventListener("click", () => {});
 
+      // Close call overlay
       byId("btnCloseCall").addEventListener("click", () => hide(byId("callOverlay")));
       byId("callOverlay").addEventListener("click", (e) => {
         if (e.target === byId("callOverlay")) hide(byId("callOverlay"));
       });
 
+      // Call controls
       byId("btnStartCall").addEventListener("click", () => {
         const ok = startCallSync();
         if (!ok) alert("Not ready yet — WebRTC widget button not found.");
       });
-
       byId("btnEndCall").addEventListener("click", async () => { await endCall(); });
       byId("btnClearTranscript").addEventListener("click", () => clearTranscript());
 
+      // Click Here CTA
       byId("btnOpenXapp").addEventListener("click", () => {
         const url = getUrlForPendingStep() || (pendingXappStep == null ? FALLBACK_XAPP_URL : null);
         if (!url) return;
+
         if (pendingXappStep !== null) lastConsumedXappStep = pendingXappStep;
+
         hideXappCta();
         updateXappCtaButton();
         openXappInApp(url);
       });
 
+      // xApp overlay close
       byId("btnCloseXapp").addEventListener("click", () => closeXapp());
       byId("xappOverlay").addEventListener("click", (e) => {
         if (e.target === byId("xappOverlay")) closeXapp();
       });
 
+      // Cosmetic
       byId("btnSearch").addEventListener("click", openBookings);
       byId("btnViewDeals").addEventListener("click", () => alert("Demo: deals screen not implemented in this mock."));
 
